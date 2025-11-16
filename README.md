@@ -11,7 +11,8 @@ Overall, this is a pretty simple project with basic dependencies:
 - Play around with some high quality (and completely in-browser) text-to-speech voices.
 
 ## Demo
-[Demo Video](docs/demo-video.mkv)
+[Video](docs/resources/demo.mkv)
+[GIF](docs/resources/demo.gif)
 
 ## Text-to-speech samples (From Hugging Face)
 Voice: [Heart](https://cdn-uploads.huggingface.co/production/uploads/61b253b7ac5ecaae3d1efe0c/S_9tkA75BT_QHKOzSX6S-.wav)<br>
