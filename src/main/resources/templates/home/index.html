@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Home</title>
+</head>
+<body>
+<section layout:fragment="content">
+    <div class="flex flex-col flex-grow h-full items-center space-y-4 text-center bg-white p-8 rounded shadow-md">
+        <h2
+                style="text-shadow: 1px 1px 0 #000;"
+                class="text-2xl font-bold uppercase text-blue-600 text-center">
+            Gabagool Text-to-Speech
+        </h2>
+        <p>Powered by Transformers.js</p>
+        <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700">
+
+        <div class="flex flex-row border-1 bg-blue-100 mx-auto w-full justify-evenly p-4">
+            <textarea
+                    class="w-full h-64 p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                    id="text-to-convert"
+                    placeholder="I want to say..."></textarea>
+        </div>
+        <button th:replace="~{fragments/button :: field('convert-button', 'submit', 'Convert to Audio', 'blue', null)}"></button>
+        <div th:replace="~{fragments/select-field :: selectField(
+            'voices',
+            true,
+            'Select Voice',
+            ${voiceOptions}
+        )}"></div>
+
+        <div class="overflow-y-auto max-h-full w-full mx-2">
+            <h2
+                    style="text-shadow: 1px 1px 0 #000;"
+                    class="text-xl font-bold uppercase text-blue-600 text-center hidden">
+                Audio Files
+            </h2>
+        </div>
+    </div>
+    <script>
+        const worker = new Worker('js/model_worker_kokoro.js', { type: 'module' });
+
+        function convertTextToSpeech() {
+            const text = document.getElementById('text-to-convert').value;
+            const voice = document.getElementById('voices').value;
+            if (!text) {
+                return;
+            }
+            showLoader('Generating...');
+            worker.postMessage({'type': 'run_model', 'text': text, 'voice': voice});
+        }
+
+        function convertAudioDataToSoundAndPlay(audioData) {
+            const { data, sampling_rate } = audioData;
+            const context = new AudioContext({ sampleRate: sampling_rate });
+            const buffer = context.createBuffer(1, data.length, sampling_rate);
+            buffer.copyToChannel(data, 0);
+            const source = context.createBufferSource();
+            source.buffer = buffer;
+            source.connect(context.destination);
+            source.start();
+        }
+
+        document.getElementById('convert-button').addEventListener('click', async function () {
+            convertTextToSpeech();
+        });
+
+        worker.onmessage = function(event) {
+            let data;
+            try {
+                data = event.data;
+                if (data.type === 'loaded_model') {
+                    console.debug('loaded the model');
+                } else if (data.type === 'new_audio') {
+                    convertAudioDataToSoundAndPlay(data);
+                } else if (data.type === 'debug') {
+                    console.debug('Debug message', data);
+                } else if (data.error) {
+                    console.error('Error in worker', data);
+                } else {
+                    console.error('New unexpected message', data);
+                }
+            } catch (error) {
+                console.error(error);
+            } finally {
+                if (data && data['type'] && data.type !== 'debug') {
+                    hideLoader();
+                }
+            }
+        };
+
+        worker.onerror = function(error) {
+            console.error('Error in worker:', error);
+            hideLoader();
+        };
+
+        window.addEventListener("load", (event) => {
+            worker.postMessage({'type': 'load_model'})
+            showLoader('Loading text-to-speech model...');
+        });
+    </script>
+</section>
+</body>
+</html>

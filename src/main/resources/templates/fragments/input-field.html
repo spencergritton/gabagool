@@ -1,0 +1,12 @@
+<div th:fragment="field(type, name, required, label)">
+    <label th:for="${name}" class="block text-gray-700 text-sm font-bold mb-2"
+           th:text="${label}">Label</label>
+    <input
+            th:type="${type}"
+            th:name="${name}"
+            th:id="${name}"
+            th:attr="required=${required}"
+            autocomplete="off"
+            class="w-full bg-white text-black font-mono text-sm px-4 py-2 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:shadow-none focus:translate-x-[4px] focus:translate-y-[4px] transition-transform duration-150"
+    />
+</div>

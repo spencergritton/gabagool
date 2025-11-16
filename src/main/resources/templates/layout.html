@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <title layout:title-pattern="$CONTENT_TITLE">Gabagool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+</head>
+<body class="flex flex-col min-h-screen bg-gray-100 text-gray-900">
+    <header style="text-shadow: 4px 4px 0 #000;"
+            class="uppercase font-bold p-10 bg-blue-600 text-white">
+        <a href="/">
+            <h1 class="text-4xl">Gabagool</h1>
+        </a>
+        <div class="text-right">
+            <div th:if="${#authentication != null and #authentication.name != 'anonymousUser'}">
+                Hi, <span th:text="${#authentication.name}">User</span>
+            </div>
+        </div>
+    </header>
+    <div id="alert"></div>
+    <div th:replace="~{fragments/error :: field('Error', true)}"></div>
+
+    <main layout:fragment="content" class="flex flex-col flex-grow h-0 max-w-screen-2xl mx-auto w-full py-8">
+        <!-- Page-specific content here -->
+    </main>
+
+    <div id='loader' class="absolute inset-0 bg-black bg-opacity-50 flex flex-col space-y-4 items-center justify-center z-50 hidden">
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
+        <h2
+                style="text-shadow: 1px 1px 0 #000;"
+                class="text-xl font-bold uppercase text-blue-600 text-center">
+           Loading...
+        </h2>
+    </div>
+
+    <script>
+        function showLoader(text) {
+            const loader = document.getElementById('loader');
+            loader.querySelector(':scope > h2').innerText = text;
+            loader.classList.remove('hidden');
+        }
+
+        function hideLoader() {
+            document.getElementById('loader').classList.add('hidden');
+        }
+
+        document.body.addEventListener("htmx:responseError", function(evt) {
+            const errorText = evt.detail.xhr.responseText;
+            const errorStrong = document.getElementById("error");
+            error.parentElement.classList.remove('hidden');
+            errorStrong.innerHTML = errorText;
+        });
+    </script>
+</body>
+</html>
