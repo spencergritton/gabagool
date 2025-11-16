@@ -12,7 +12,7 @@ Overall, this is a pretty simple project with basic dependencies:
 
 ## Demo
 ![Video](docs/resources/demo.mkv)<br>
-Or (no sound) ![GIF](docs/resources/demo.gif)
+<img src="/docs/resources/demo.gif" width="1280px" height="720px"/>
 
 ## Text-to-speech samples (From Hugging Face)
 Voice: [Heart](https://cdn-uploads.huggingface.co/production/uploads/61b253b7ac5ecaae3d1efe0c/S_9tkA75BT_QHKOzSX6S-.wav)<br>
